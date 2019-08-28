@@ -1,21 +1,16 @@
 /* eslint-disable max-lines */
-import {
-  isAngularProperty,
-  isNativeCodeProperty,
-  InjectorProxyHandler,
-  ServiceProxyHandler,
-  proxify,
-  injectorProxy,
-} from './injector-proxy';
 
-import { InjectorLoggingUtils } from './injector-logging-utils';
+import { LoggingUtils } from './logging-utils';
+import { angularFilter } from "./filters";
+import {InjectorProxyHandler} from "./proxy_handlers/injector";
+import {ObjectProxyHandler} from "./proxy_handlers/object";
 
 const {
   GetMissingServiceMsg,
-  GetMissingServicePropertyMsg,
-  SetMissingServicePropertyMsg,
-  CallMissingServiceMethodMsg,
-} = InjectorLoggingUtils;
+  GetMissingPropertyMsg,
+  SetMissingPropertyMsg,
+  CallMissingMethodMsg,
+} = LoggingUtils;
 
 const someValue = { someVal: 'someVal' };
 const poked = 'poked';
@@ -96,9 +91,9 @@ const injectorOptions = {
   proxifyPromise: true,
   injector: dummyInjector.get,
   onGetMissingService: (...args: any[]) => Logger.logFatal(...args),
-  onGetMissingServiceProperty: (...args: any[]) => Logger.logWarn(...args),
-  onSetMissingServiceProperty: (...args: any[]) => Logger.logWarn(...args),
-  onCallMissingServiceMethod: (...args: any[]) => Logger.logFatal(...args),
+  onGetMissingProperty: (...args: any[]) => Logger.logWarn(...args),
+  onSetMissingProperty: (...args: any[]) => Logger.logWarn(...args),
+  onCallMissingMethod: (...args: any[]) => Logger.logFatal(...args),
 };
 
 describe('Injector Proxy', () => {
@@ -117,7 +112,7 @@ describe('Injector Proxy', () => {
       const primitive = 'propName';
       const symbol = Symbol('dummySymbol');
 
-      const msgTemplate = InjectorLoggingUtils.logTemplate('firstParam: {0} symbol: {1}');
+      const msgTemplate = LoggingUtils.logTemplate('firstParam: {0} symbol: {1}');
       const result = msgTemplate(primitive, symbol);
 
       expect(result).toBe(`firstParam: ${primitive} symbol: Symbol(dummySymbol)`);
@@ -127,37 +122,10 @@ describe('Injector Proxy', () => {
       const primitive = 'propName';
       const symbol = Symbol('dummySymbol');
 
-      const msgTemplate = InjectorLoggingUtils.logTemplate('firstParam: {0} {1} symbol: {1} {0}');
+      const msgTemplate = LoggingUtils.logTemplate('firstParam: {0} {1} symbol: {1} {0}');
       const result = msgTemplate(primitive, symbol);
 
       expect(result).toBe(`firstParam: ${primitive} Symbol(dummySymbol) symbol: Symbol(dummySymbol) ${primitive}`);
-    });
-  });
-
-  describe('isNativeCodeProperty', () => {
-    it('Filter native code calls as fn.call', () => {
-      [Date.now, Array.from, Object.assign, Promise.resolve].forEach(subject => {
-        expect(isNativeCodeProperty(subject)).toBeTruthy();
-      });
-
-      // eslint-disable-next-line dot-notation
-      Date['customOverride'] = function() {};
-
-      // eslint-disable-next-line dot-notation
-      [it, isAngularProperty, Date['customOverride']].forEach(subject => {
-        expect(isNativeCodeProperty(subject)).toBeFalsy();
-      });
-    });
-  });
-
-  describe('isAngularProperty', () => {
-    it('Filter angular properties $', () => {
-      ['$scope', '$model', '$$hashKey'].forEach(key => {
-        expect(isAngularProperty(key)).toBeTruthy();
-      });
-      ['scope', 'model', 'hashKey'].forEach(key => {
-        expect(isAngularProperty(key)).toBeFalsy();
-      });
     });
   });
 
@@ -167,7 +135,7 @@ describe('Injector Proxy', () => {
 
     beforeEach(() => {
       injectorProxyHandler = new InjectorProxyHandler(injectorOptions);
-      injectorProxyService = injectorProxy(injectorOptions);
+      injectorProxyService = injectorProxyHandler(injectorOptions);
     });
 
     // Remove when relevant feature flag / approach embedded.
@@ -227,16 +195,16 @@ describe('Injector Proxy', () => {
     });
   });
 
-  describe('ServiceProxyHandler', () => {
+  describe('ObjectProxyHandler', () => {
     let target: DummyService;
-    let serviceProxyHandler: ServiceProxyHandler;
+    let objectProxyHandler: ObjectProxyHandler;
     let serviceApi;
 
     describe('Proxy Getter', () => {
       beforeEach(() => {
         target = new DummyService();
-        serviceProxyHandler = new ServiceProxyHandler(injectorOptions);
-        serviceApi = proxify(serviceProxyHandler, target);
+        objectProxyHandler = new ObjectProxyHandler(injectorOptions);
+        serviceApi = objectProxyHandler.proxify(objectProxyHandler, target);
       });
 
       it('Get existing by prototype property', () => {
@@ -321,33 +289,33 @@ describe('Injector Proxy', () => {
     describe('Proxy Setter', () => {
       beforeEach(() => {
         target = new DummyService();
-        serviceProxyHandler = new ServiceProxyHandler(injectorOptions);
-        serviceApi = proxify(serviceProxyHandler, target);
+        objectProxyHandler = new ObjectProxyHandler(injectorOptions);
+        serviceApi = proxify(objectProxyHandler, target);
       });
 
       it('Set existing property', () => {
-        const succeed = serviceProxyHandler.set(target, ExistingServiceProperty, someValue);
+        const succeed = objectProxyHandler.set(target, ExistingServiceProperty, someValue);
 
         expect(succeed).toBeTruthy();
         expect((<any>target)[ExistingServiceProperty]).toBe(someValue);
       });
 
       it('Set none existing property', () => {
-        const succeed = serviceProxyHandler.set(target, NoneExistingServiceProperty, someValue);
+        const succeed = objectProxyHandler.set(target, NoneExistingServiceProperty, someValue);
 
         expect(succeed).toBeTruthy();
         expect((<any>target)[NoneExistingServiceProperty]).toBe(someValue);
       });
 
       it('Set existing filtered(angular) property', () => {
-        const succeed = serviceProxyHandler.set(target, ExistingServiceNgProperty, someValue);
+        const succeed = objectProxyHandler.set(target, ExistingServiceNgProperty, someValue);
 
         expect(succeed).toBeTruthy();
         expect((<any>target)[ExistingServiceNgProperty]).toBe(someValue);
       });
 
       it('Set non existing filtered(angular) property', () => {
-        const succeed = serviceProxyHandler.set(target, NoneExistingServiceNgProperty, someValue);
+        const succeed = objectProxyHandler.set(target, NoneExistingServiceNgProperty, someValue);
 
         expect(succeed).toBeTruthy();
         expect((<any>target)[NoneExistingServiceNgProperty]).toBe(someValue);
@@ -357,8 +325,8 @@ describe('Injector Proxy', () => {
     describe('Proxy Method Call(Apply)', () => {
       beforeEach(() => {
         target = new DummyService();
-        serviceProxyHandler = new ServiceProxyHandler(injectorOptions);
-        serviceApi = proxify(serviceProxyHandler, target);
+        objectProxyHandler = new ObjectProxyHandler(injectorOptions);
+        serviceApi = proxify(objectProxyHandler, target);
       });
 
       it('Apply existing base method', () => {
@@ -389,36 +357,36 @@ describe('Injector Proxy', () => {
     describe('Log calls for none existing api/property', () => {
       beforeEach(() => {
         target = new DummyService();
-        serviceProxyHandler = new ServiceProxyHandler(injectorOptions);
-        serviceApi = proxify(serviceProxyHandler, target);
+        objectProxyHandler = new ObjectProxyHandler(injectorOptions);
+        serviceApi = proxify(objectProxyHandler, target);
 
         logWarnSpy.calls.reset();
         logFatalSpy.calls.reset();
       });
 
       it('Get: None existing service api', () => {
-        serviceProxyHandler.get(target, NoneExistingServiceApi);
+        objectProxyHandler.get(target, NoneExistingServiceApi);
 
-        const expectedMsg = GetMissingServicePropertyMsg(NoneExistingServiceApi);
+        const expectedMsg = GetMissingPropertyMsg(NoneExistingServiceApi);
 
         expect(logWarnSpy).toHaveBeenCalledWith(expectedMsg, NoneExistingServiceApi);
       });
 
       it('Get: No logs for None existing filtered(angular) service api', () => {
-        serviceProxyHandler.get(target, NoneExistingServiceNgApi);
+        objectProxyHandler.get(target, NoneExistingServiceNgApi);
         expect(logWarnSpy).not.toHaveBeenCalled();
       });
 
       it('Set: None existing service property', () => {
-        serviceProxyHandler.set(target, NoneExistingServiceProperty, someValue);
+        objectProxyHandler.set(target, NoneExistingServiceProperty, someValue);
 
-        const expectedMsg = SetMissingServicePropertyMsg(NoneExistingServiceProperty, someValue);
+        const expectedMsg = SetMissingPropertyMsg(NoneExistingServiceProperty, someValue);
 
         expect(logWarnSpy).toHaveBeenCalledWith(expectedMsg, NoneExistingServiceProperty, someValue);
       });
 
       it('Set: No logs for None existing filtered(angular) service property', () => {
-        serviceProxyHandler.set(target, NoneExistingServiceNgProperty, someValue);
+        objectProxyHandler.set(target, NoneExistingServiceNgProperty, someValue);
         expect(logWarnSpy).not.toHaveBeenCalled();
       });
 
@@ -426,7 +394,7 @@ describe('Injector Proxy', () => {
         serviceApi[NoneExistingServiceApi]();
 
         const targetStr = JSON.stringify(target);
-        const expectedMsg = CallMissingServiceMethodMsg(NoneExistingServiceApi, targetStr, []);
+        const expectedMsg = CallMissingMethodMsg(NoneExistingServiceApi, targetStr, []);
 
         expect(logFatalSpy).toHaveBeenCalledWith(expectedMsg, targetStr, []);
       });
