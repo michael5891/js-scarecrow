@@ -1,30 +1,30 @@
 /**
  * Ignore native code as fn.call or native object flows as Map.forEach
  */
-export function isNativeCodeProperty(subject: { toString }) {
-  if (!subject) return false;
+export function isNativeCodeProperty(value: { toString }) {
+  if (!value) return false;
 
-  return isNativeFunctionCall(subject) || isNativeTypeCall(subject);
+  return isNativeFunctionCall(value) || isNativeTypeCall(value);
 }
 
-export function isNativeFunctionCall(subject: { toString }) {
-  if (!subject) return false;
+export function isNativeFunctionCall(value: { toString }) {
+  if (!value) return false;
 
-  return isFunction(subject) && /\[native code]/.test(subject.toString());
+  return isFunction(value) && /\[native code]/.test(value.toString());
 }
 
-export function isNativeTypeCall(subject: { toString }) {
-  if (!subject) return false;
+export function isNativeTypeCall(value: { toString }) {
+  if (!value) return false;
 
-  return !isFunction(subject) && Boolean(subject[Symbol.toStringTag]);
+  return !isFunction(value) && Boolean(value[Symbol.toStringTag]);
 }
 
-export function isFunction(subject) {
-  return typeof subject === 'function';
+export function isFunction(value) {
+  return typeof value === 'function';
 }
 
-export function isSymbol(item) {
-  return typeof item === 'symbol';
+export function isSymbol(value) {
+  return typeof value === 'symbol';
 }
 
 export function bindFn(target, prop) {
@@ -41,6 +41,11 @@ export function bindSymbol(target, prop) {
    */
   if (prop === Symbol.toStringTag) {
     return target[Symbol.toStringTag] ? bindFn(target, prop) : bindFn(target, 'toString');
+  }
+
+  // Encountered in tests mode by jest.
+  if (Symbol.keyFor(prop) === 'nodejs.util.inspect.custom') {
+    return; // the symbol doesnt exist on the target
   }
 
   return bindFn(target, prop);

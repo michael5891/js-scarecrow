@@ -3,7 +3,7 @@ import {isPromiseNative, PromiseProxyHandler} from "./promise";
 import {defaultLogger, devLog, LoggingUtils} from "../logging-utils";
 import {isProxyFn, proxyFn} from "./base";
 import {bindFn, bindSymbol, isNativeFunctionCall, isNativeTypeCall, isSymbol} from "../generics";
-import {ObjectProxyHandlerOptions} from "./object.interface";
+import {IObjectProxyHandlerOptions} from "./object.interface";
 
 const {
     GetMissingPropertyMsg,
@@ -25,7 +25,7 @@ export class ObjectProxyHandler extends PromiseProxyHandler {
                     onGetMissingProperty = defaultLogger,
                     onSetMissingProperty = defaultLogger,
                     onCallMissingMethod = defaultLogger,
-                }: ObjectProxyHandlerOptions = {}) {
+                }: IObjectProxyHandlerOptions = {}) {
         super();
         this.propsFilter = propsFilter;
         this.onGetMissingProperty = onGetMissingProperty;
@@ -87,7 +87,7 @@ export class ObjectProxyHandler extends PromiseProxyHandler {
         return this.proxify(target.apply(thisArg, argsList));
     }
 
-    proxify(target: any = proxyFn(), name = null) {
+    protected proxify(target: any = proxyFn(), name = null) {
         const subject = super.proxify(target, name);
 
         if(this.filter(subject)) {
@@ -102,7 +102,7 @@ export class ObjectProxyHandler extends PromiseProxyHandler {
         return new Proxy(subject, new ObjectProxyHandler());
     }
 
-    stringify(target) {
+    protected stringify(target) {
         if (target && target.__proxy_target__) {
             return JSON.stringify(target.__proxy_target__) || target.__proxy_target__.toString();
         }

@@ -35,12 +35,8 @@ export class PromiseProxyHandler extends BaseProxyHandler {
         return typeof value === 'function' ? bindFn(scope, prop) : value;
     }
 
-    proxify(target: any = proxyFn(), name = null) {
+    protected proxify(target: any = proxyFn(), name = null) {
         const subject = super.proxify(target, name);
-
-        if(this.filter(subject)) {
-            return subject;
-        }
 
         if (isPromise(subject)) {
             return new Proxy(subject, new PromiseProxyHandler());

@@ -1,7 +1,7 @@
 import { LoggingUtils, defaultLogger, devLog } from "../logging-utils";
 import {BaseProxyHandler, proxyFn} from "./base";
 import {ObjectProxyHandler} from "./object";
-import {InjectorProxyHandlerOptions, ObjectProxyHandlerOptions} from "./object.interface";
+import {IInjectorProxyHandlerOptions, IObjectProxyHandlerOptions} from "./object.interface";
 
 const { GetMissingServiceMsg } = LoggingUtils;
 
@@ -12,11 +12,11 @@ export class InjectorProxyHandler extends BaseProxyHandler {
 
     readonly serviceProxyHandler: ObjectProxyHandler;
 
-    constructor({ injector, onGetMissingService = defaultLogger }: InjectorProxyHandlerOptions) {
+    constructor({ injector, onGetMissingService = defaultLogger }: IInjectorProxyHandlerOptions) {
         super();
         this.injector = injector;
         this.onGetMissingService = onGetMissingService;
-        this.serviceProxyHandler = new ObjectProxyHandler(arguments[0] as ObjectProxyHandlerOptions);
+        this.serviceProxyHandler = new ObjectProxyHandler(arguments[0] as IObjectProxyHandlerOptions);
     }
 
     get(target: {}, name: string | number | symbol): any {

@@ -23,7 +23,7 @@ export class BaseProxyHandler {
         return key in target;
     }
 
-    proxify(target: any = proxyFn(), name = null) {
+    protected proxify(target: any = proxyFn(), name = null) {
         return name ? target[name] : target;
     }
 
