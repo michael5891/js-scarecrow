@@ -1,7 +1,7 @@
 import { defaultPropsFilter } from "../filters";
-import {isPromiseNative, PromiseProxyHandler} from "./promise";
+import {isPromise, isPromiseNative, PromiseProxyHandler} from "./promise";
 import {defaultLogger, devLog, LoggingUtils} from "../logging-utils";
-import {isProxyFn, proxyFn} from "./base";
+import {BaseProxyHandler, isProxyFn, proxyFn} from "./base";
 import {bindFn, bindSymbol, isNativeFunctionCall, isNativeTypeCall, isSymbol} from "../generics";
 import {IObjectProxyHandlerOptions} from "./object.interface";
 
@@ -11,7 +11,7 @@ const {
     CallMissingMethodMsg,
 } = LoggingUtils;
 
-export class ObjectProxyHandler extends PromiseProxyHandler {
+export class ObjectProxyHandler extends BaseProxyHandler {
     readonly propsFilter: (name: string | any) => boolean;
 
     readonly onGetMissingProperty: (msg: string, name: string) => void;
@@ -89,6 +89,10 @@ export class ObjectProxyHandler extends PromiseProxyHandler {
 
     protected proxify(target: any = proxyFn(), name = null) {
         const subject = super.proxify(target, name);
+
+        if (isPromise(subject)) {
+            return new Proxy(subject, new PromiseProxyHandler());
+        }
 
         if(this.filter(subject)) {
             return subject;

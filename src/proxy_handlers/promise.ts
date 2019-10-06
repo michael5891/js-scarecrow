@@ -1,5 +1,6 @@
 import {BaseProxyHandler, proxyFn} from "./base";
 import {bindFn} from "../generics";
+import {ObjectProxyHandler} from "./object";
 
 /**
  * None es6 promise polyfill as bluebird will have a simple 'then' function.
@@ -42,6 +43,10 @@ export class PromiseProxyHandler extends BaseProxyHandler {
             return new Proxy(subject, new PromiseProxyHandler());
         }
 
-        return subject;
+        if (this.isProxified(subject)) {
+            return subject;
+        }
+
+        return new Proxy(subject, new ObjectProxyHandler());
     }
 }

@@ -11,8 +11,6 @@ const {
 
 const someValue = { someVal: 'someVal' };
 const poked = 'poked';
-const ExistingServiceName = 'ExistingServiceName';
-const NoneExistingServiceName = 'NoneExistingServiceName';
 
 const ExistingServiceBaseProperty = 'baseProperty';
 const ExistingServiceBasePropertyValue = 'basePoke';
@@ -26,7 +24,6 @@ const NoneExistingServiceNgProperty = '$someProperty2';
 
 const ExistingServiceApi = 'poke';
 const ExistingServiceAsyncApi = 'async_poke';
-const ExistingServiceAsyncPolyApi = 'async_poly_poke';
 const ExistingServiceNativeTypeApi = 'native_type_poke';
 const NoneExistingServiceApi = 'poke2';
 
@@ -59,9 +56,7 @@ class DummyService extends BaseService {
     };
 
     [ExistingServiceAsyncApi] = async function(arg = '') {
-        debugger
-        console.log("WTF?");
-        return Promise.resolve(dummyService);
+        return Promise.resolve(new DummyService());
     };
 
     [ExistingServiceNativeTypeApi] = async function(arg = '') {
@@ -73,22 +68,12 @@ class DummyService extends BaseService {
     };
 }
 
-const dummyService = new DummyService();
-const dummyInjector = {
-    get: (serviceName: string) => (serviceName === ExistingServiceName ? dummyService : null),
-    youShellNotPass: () => {
-        throw new Error('En taro adun!');
-    },
-};
-
 const Logger = {
     logWarn: (...args: any[]) => console.log(...args),
     logFatal: (...args: any[]) => console.log(...args),
 };
 
-const injectorOptions = {
-    injector: dummyInjector.get,
-    onGetMissingService: (...args: any[]) => Logger.logFatal(...args),
+const objProxyOptions = {
     onGetMissingProperty: (...args: any[]) => Logger.logWarn(...args),
     onSetMissingProperty: (...args: any[]) => Logger.logWarn(...args),
     onCallMissingMethod: (...args: any[]) => Logger.logFatal(...args),
@@ -111,24 +96,24 @@ describe('Object Proxy', () => {
         describe('Proxy Getter', () => {
             beforeEach(() => {
                 target = new DummyService();
-                objectProxyHandler = new ObjectProxyHandler(injectorOptions);
+                objectProxyHandler = new ObjectProxyHandler(objProxyOptions);
                 serviceApi = new Proxy(target, objectProxyHandler);
             });
-            //
-            // it('Get existing by prototype property', () => {
-            //     expect(serviceApi[ExistingServiceBaseProperty]).toBe(ExistingServiceBasePropertyValue);
-            // });
-            //
-            // it('Get existing property', () => {
-            //     expect(serviceApi[ExistingServiceApi]()).toBe(target[ExistingServiceApi]());
-            // });
-            //
-            // it('Get existing async property (Promise)', async () => {
-            //     const actual = await serviceApi[ExistingServiceAsyncApi]();
-            //     const expected = await target[ExistingServiceAsyncApi]();
-            //
-            //     expect(expected.id).toBe(actual.id);
-            // });
+
+            it('Get existing by prototype property', () => {
+                expect(serviceApi[ExistingServiceBaseProperty]).toBe(ExistingServiceBasePropertyValue);
+            });
+
+            it('Get existing property', () => {
+                expect(serviceApi[ExistingServiceApi]()).toBe(target[ExistingServiceApi]());
+            });
+
+            it('Get existing async property (Promise)', async () => {
+                const actual = await serviceApi[ExistingServiceAsyncApi]();
+                const expected = await target[ExistingServiceAsyncApi]();
+
+                expect(expected.id).toBe(actual.id);
+            });
 
             it('Get existing async property (Promise) with none existing property invocation', async () => {
                 const proxifiedResponse = await serviceApi[ExistingServiceAsyncApi]();
@@ -197,7 +182,7 @@ describe('Object Proxy', () => {
         describe('Proxy Setter', () => {
             beforeEach(() => {
                 target = new DummyService();
-                objectProxyHandler = new ObjectProxyHandler(injectorOptions);
+                objectProxyHandler = new ObjectProxyHandler(objProxyOptions);
                 serviceApi = new Proxy(target, objectProxyHandler);
             });
 
@@ -233,7 +218,7 @@ describe('Object Proxy', () => {
         describe('Proxy Method Call(Apply)', () => {
             beforeEach(() => {
                 target = new DummyService();
-                objectProxyHandler = new ObjectProxyHandler(injectorOptions);
+                objectProxyHandler = new ObjectProxyHandler(objProxyOptions);
                 serviceApi = new Proxy(target, objectProxyHandler);
             });
 
@@ -265,7 +250,7 @@ describe('Object Proxy', () => {
         describe('Log calls for none existing api/property', () => {
             beforeEach(() => {
                 target = new DummyService();
-                objectProxyHandler = new ObjectProxyHandler(injectorOptions);
+                objectProxyHandler = new ObjectProxyHandler(objProxyOptions);
                 serviceApi = new Proxy(target, objectProxyHandler);
 
                 logWarnSpy.calls.reset();
@@ -296,15 +281,6 @@ describe('Object Proxy', () => {
             it('Set: No logs for None existing filtered(angular) service property', () => {
                 objectProxyHandler.set(target, NoneExistingServiceNgProperty, someValue);
                 expect(logWarnSpy).not.toHaveBeenCalled();
-            });
-
-            it('Apply: logs for None existing service method', () => {
-                serviceApi[NoneExistingServiceApi]();
-
-                const targetStr = JSON.stringify(target);
-                const expectedMsg = CallMissingMethodMsg(NoneExistingServiceApi, targetStr, []);
-
-                expect(logFatalSpy).toHaveBeenCalledWith(expectedMsg, targetStr, []);
             });
         });
     });
