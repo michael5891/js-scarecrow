@@ -12,6 +12,14 @@ export class InjectorProxyHandler extends BaseProxyHandler {
 
     readonly serviceProxyHandler: ObjectProxyHandler;
 
+    /***
+     * @param injector(name: string | number | symbol): any;
+     * @param onGetMissingService?(msg: string, name: string | number | symbol): void;
+     * @param propsFilter?(name: string): boolean;
+     * @param onGetMissingProperty?(msg: string, ...args: any[]): void;
+     * @param onSetMissingProperty?(msg: string, ...args: any[]): void;
+     * @param onCallMissingMethod?(msg: string, ...args: any[]): void;
+     */
     constructor({ injector, onGetMissingService = defaultLogger }: IInjectorProxyHandlerOptions) {
         super();
         this.injector = injector;
