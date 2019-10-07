@@ -47,6 +47,7 @@ export class PromiseProxyHandler extends BaseProxyHandler {
             return subject;
         }
 
+        // TODO: new object proxy handler should receive logging call backs
         return new Proxy(subject, new ObjectProxyHandler());
     }
 }

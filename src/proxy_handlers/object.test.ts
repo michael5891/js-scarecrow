@@ -258,29 +258,35 @@ describe('Object Proxy', () => {
             });
 
             it('Get: None existing service api', () => {
-                objectProxyHandler.get(target, NoneExistingServiceApi);
-
+                const temp = serviceApi[NoneExistingServiceApi];
                 const expectedMsg = GetMissingPropertyMsg(NoneExistingServiceApi);
 
                 expect(logWarnSpy).toHaveBeenCalledWith(expectedMsg, NoneExistingServiceApi);
             });
 
             it('Get: No logs for None existing filtered(angular) service api', () => {
-                objectProxyHandler.get(target, NoneExistingServiceNgApi);
+                const temp = serviceApi[NoneExistingServiceNgApi];
                 expect(logWarnSpy).not.toHaveBeenCalled();
             });
 
             it('Set: None existing service property', () => {
-                objectProxyHandler.set(target, NoneExistingServiceProperty, someValue);
-
+                serviceApi[NoneExistingServiceProperty] = someValue;
                 const expectedMsg = SetMissingPropertyMsg(NoneExistingServiceProperty, someValue);
 
                 expect(logWarnSpy).toHaveBeenCalledWith(expectedMsg, NoneExistingServiceProperty, someValue);
             });
 
             it('Set: No logs for None existing filtered(angular) service property', () => {
-                objectProxyHandler.set(target, NoneExistingServiceNgProperty, someValue);
+                serviceApi[NoneExistingServiceNgProperty] = someValue;
                 expect(logWarnSpy).not.toHaveBeenCalled();
+            });
+
+            it('Apply: None existing service api', () => {
+                serviceApi[NoneExistingServiceApi]();
+                const expectedMsg = CallMissingMethodMsg(NoneExistingServiceApi, target, []);
+
+                expect(logWarnSpy).toHaveBeenCalled();
+                expect(logFatalSpy).toHaveBeenCalledWith(expectedMsg, JSON.stringify(target), []);
             });
         });
     });

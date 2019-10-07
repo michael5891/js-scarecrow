@@ -103,7 +103,7 @@ export class ObjectProxyHandler extends BaseProxyHandler {
             return bindFn(target, name);
         }
 
-        return new Proxy(subject, new ObjectProxyHandler());
+        return new Proxy(subject, this);
     }
 
     protected stringify(target) {
