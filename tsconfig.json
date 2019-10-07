@@ -3,6 +3,8 @@
     "outDir": "./dist/",
     "rootDir": "src",
     "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
     "moduleResolution": "node",
     "target": "es2015",
     "module": "es2015",

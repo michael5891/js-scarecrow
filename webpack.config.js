@@ -2,6 +2,7 @@ const path = require('path');
 
 const config =  {
   entry: './src/index.ts',
+  devtool: 'hidden-source-map',
   module: {
     rules: [
       {
@@ -23,7 +24,7 @@ const config =  {
 
 module.exports = (env, args) => {
   if (args.mode === 'development') {
-    config.devtool = 'hidden-source-map';
+    config.devtool = 'inline-source-map';
   }
 
   return config;

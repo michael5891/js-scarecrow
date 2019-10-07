@@ -1,8 +1,9 @@
 {
   "name": "js-scarecrow",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "JS access apis fail safe proxy wrapper, for object properties that does not exists i.e is undefined",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/types",
   "repository": "git@github.com:michael5891/js-scarecrow.git",
   "author": "Michael Yakubov",
   "license": "MIT",
@@ -19,6 +20,6 @@
   "scripts": {
     "test": "jest",
     "build": "webpack --mode=development",
-    "build-prod": "webpack --mode=production"
+    "build-prod": "webpack --mode=production -p"
   }
 }
