@@ -15,7 +15,7 @@ const config =  {
     extensions: [ '.ts', '.js' ],
   },
   output: {
-    filename: 'bundle.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
   },
 };
@@ -23,7 +23,7 @@ const config =  {
 
 module.exports = (env, args) => {
   if (args.mode === 'development') {
-    config.devtool = 'source-map';
+    config.devtool = 'hidden-source-map';
   }
 
   return config;

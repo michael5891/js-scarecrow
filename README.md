@@ -1,3 +1,5 @@
+<img src='https://image.flaticon.com/icons/svg/477/477131.svg' width='128' height='128' />
+
 # js-scarecrow
 JS fail safe apis access proxy wrapper
 
