@@ -8,8 +8,13 @@
  * or application out of sync in case of multi iframe shared services / resources.
  */
 import {InjectorProxyHandler} from './proxy_handlers/injector';
-import {IInjectorProxyHandlerOptions} from "./proxy_handlers/object.interface";
+import {IInjectorProxyHandlerOptions, IObjectProxyHandlerOptions} from "./proxy_handlers/object.interface";
+import {ObjectProxyHandler} from "./proxy_handlers/object";
 
 export function InjectionProxy(options: IInjectorProxyHandlerOptions): {} {
   return new Proxy({}, new InjectorProxyHandler(options));
+}
+
+export function ObjectProxy(target: any, options: IObjectProxyHandlerOptions): {} {
+  return new Proxy(target, new ObjectProxyHandler(options));
 }

@@ -1,19 +1,11 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "./dist/",
     "rootDir": "src",
-    "baseUrl": ".",
-    "downlevelIteration": true,
     "sourceMap": true,
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es2015",
     "module": "es2015",
-    "lib": [
-      "es2018",
-      "dom"
-    ],
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "types": [
       "jest"
     ]
