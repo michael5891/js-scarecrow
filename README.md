@@ -5,10 +5,8 @@ Proxy wrapper for properties invocation that may not exist <br />
 somewhere in the invocation(a.b.c().d = 1) chain i.e is **undefined**.
 
 ### Use case
-Best example would be hosted iframe, <br />
-injected with services from the hosting application.<br />
-In case the iframe gets updated with wrong version,<br />
-you might have calls to none existing services apis,<br />
+Best example would be hosted iframe, injected with services from the hosting application.<br />
+In case the iframe gets updated with wrong version, you might have calls to none existing services apis,<br />
 you get application crash.
 
 ### Getting started
