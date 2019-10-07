@@ -1,14 +1,14 @@
 # js-scarecrow
 JS fail safe apis access proxy wrapper
 
-Return proxified value for properties invocation that does not exists,
-anywhere in the invocation(a.b.c().d = 1) chain i.e is **undefined**.
+Proxy wrapper for properties invocation that may not exist <br />
+somewhere in the invocation(a.b.c().d = 1) chain i.e is **undefined**.
 
 ### Use case
-Best example would be hosted iframe,
-injected with services from the hosting application.
-In case the iframe gets updated with wrong version,
-you might have calls to none existing services apis,
+Best example would be hosted iframe, <br />
+injected with services from the hosting application.<br />
+In case the iframe gets updated with wrong version,<br />
+you might have calls to none existing services apis,<br />
 you get application crash.
 
 ### Getting started
@@ -76,10 +76,10 @@ Executing non-existing method: "NonExistingApi" on this: {...} with arguments: [
 Setting non-existing property "NonExistingProp", value: "Ender"
 ```
 
-Provides error free, logged access to invalid services or general apis,
-From high level injected services down to bare native js bones.
+Provides error free, logged access to invalid services or general apis,<br />
+From high level injected services down to bare native js bones.<br />
 Have async promise? response is fail safe as well ;)
 
-Scarecrow wont fix the logical bug,
-but it would allow the application to skip the null pointer exceptions
+Scarecrow wont fix the logical bug,<br />
+but it would allow the application to skip the null pointer exceptions<br />
 logs any invalid function calls, property gets/sets.
