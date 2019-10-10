@@ -5,7 +5,7 @@ export const PROXY_TAG = '__proxy__';
 export function proxyFn(name: any = 'proxyFn') {
     const fn = function proxyFn() {};
 
-    fn.__proxy_fn__ = name;
+    fn["__proxy_fn__"] = name;
 
     return fn;
 }
