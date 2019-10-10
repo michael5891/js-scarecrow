@@ -43,7 +43,7 @@ export class PromiseProxyHandler extends BaseProxyHandler {
             return new Proxy(subject, new PromiseProxyHandler());
         }
 
-        if (this.isProxified(subject)) {
+        if (this.filter(subject)) {
             return subject;
         }
 
