@@ -8,6 +8,16 @@
   "author": "Michael Yakubov",
   "license": "MIT",
   "private": false,
+   "keywords": [
+    "es6",
+    "proxy",
+    "extend",
+    "object-proxy",
+    "object",
+    "optional",
+    "optionaljs",
+    "optional-js"
+  ],
   "devDependencies": {
     "@types/jest": "^24.0.13",
     "jest": "^24.8.0",
