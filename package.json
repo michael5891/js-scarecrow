@@ -1,6 +1,6 @@
 {
   "name": "js-scarecrow",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "JS access apis fail safe proxy wrapper, for object properties that does not exists i.e is undefined",
   "main": "./dist/index.js",
   "types": "./dist/types",
