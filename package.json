@@ -1,10 +1,12 @@
 {
   "name": "js-scarecrow",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "JS access apis fail safe proxy wrapper, for object properties that does not exists i.e is undefined",
   "main": "./dist/bundle.js",
   "types": "./dist/types",
-  "files": ["dis/**/*"],  
+  "files": [
+    "dist/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/michael5891/js-scarecrow"
