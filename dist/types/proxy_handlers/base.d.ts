@@ -1,8 +1,5 @@
 export declare const PROXY_TAG = "__proxy__";
-export declare function proxyFn(name?: any): {
-    (): void;
-    __proxy_fn__: any;
-};
+export declare function proxyFn(name?: any): () => void;
 export declare function isProxyFn(subject: any): boolean;
 export declare class BaseProxyHandler {
     has(target: any, key: any): boolean;
